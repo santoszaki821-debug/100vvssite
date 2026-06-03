@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: 100vvs-api
+    env: node
+    rootDir: .
+    buildCommand: npm install && npm --workspace apps/api run build
+    startCommand: npm --workspace apps/api run start:prod
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FOUNDER_PASSWORD
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

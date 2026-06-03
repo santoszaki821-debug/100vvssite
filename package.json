@@ -1,0 +1,22 @@
+{
+  "name": "100vvs-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --workspace apps/api run start:dev\" \"npm --workspace apps/web run dev\"",
+    "build": "npm --workspace apps/api run build && npm --workspace apps/web run build",
+    "start:prod": "npm --workspace apps/api run start:prod",
+    "lint": "npm --workspace apps/api run lint && npm --workspace apps/web run lint",
+    "db:generate": "npm --workspace apps/api run prisma:generate",
+    "db:push": "npm --workspace apps/api run prisma:push",
+    "db:migrate": "npm --workspace apps/api run prisma:migrate",
+    "db:seed": "npm --workspace apps/api run prisma:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

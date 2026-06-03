@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+  FOUNDER
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+enum ChannelType {
+  PUBLIC
+  DIRECT
+}
+
+enum ProfileTheme {
+  CLASSIC
+  CYBER
+  ELITE
+  OSINT
+  MINIMAL
+  PREMIUM
+}
+
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  role         Role      @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastSeenAt   DateTime?
+  profile      Profile?
+  badges       UserBadge[]
+  sentFriends  Friendship[] @relation("FriendRequester")
+  gotFriends   Friendship[] @relation("FriendReceiver")
+  messages     Message[]
+  reactions    Reaction[]
+  sessions     Session[]
+  logs         AuditLog[]
+}
+
+model Profile {
+  id             String       @id @default(cuid())
+  userId         String       @unique
+  displayName    String       @unique
+  avatarUrl      String       @default("/avatar-founder.svg")
+  bannerUrl      String       @default("/banner-premium.svg")
+  bio            String       @default("")
+  status         String       @default("Nouveau membre")
+  nameColor      String       @default("#8f1327")
+  messageFrame   String       @default("soft")
+  profileStyle   String       @default("glass")
+  theme          ProfileTheme @default(PREMIUM)
+  visibleBadges  String[]     @default([])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id          String @id @default(cuid())
+  key         String @unique
+  label       String
+  color       String
+  icon        String
+  description String
+  users       UserBadge[]
+}
+
+model UserBadge {
+  userId  String
+  badgeId String
+  grantedAt DateTime @default(now())
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge   Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, badgeId])
+}
+
+model Channel {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  name        String
+  description String
+  type        ChannelType @default(PUBLIC)
+  createdAt   DateTime    @default(now())
+  messages    Message[]
+}
+
+model Message {
+  id          String     @id @default(cuid())
+  channelId   String?
+  authorId    String
+  recipientId String?
+  body        String
+  imageUrl    String?
+  gifUrl      String?
+  replyToId   String?
+  isPinned    Boolean    @default(false)
+  isDeleted   Boolean    @default(false)
+  editedAt    DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  channel     Channel?   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replyTo     Message?   @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies     Message[]  @relation("MessageReplies")
+  reactions   Reaction[]
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  emoji     String
+  userId    String
+  messageId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([emoji, userId, messageId])
+}
+
+model Friendship {
+  id          String       @id @default(cuid())
+  requesterId String
+  receiverId  String
+  status      FriendStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  requester   User         @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver    User         @relation("FriendReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, receiverId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  ip        String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  actor     User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+}
