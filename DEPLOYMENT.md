@@ -93,12 +93,20 @@ NEXT_PUBLIC_API_URL=https://ton-api.onrender.com
 NEXT_PUBLIC_SOCKET_URL=https://ton-api.onrender.com
 ```
 
-Si tu deploies depuis le monorepo:
+Si tu deploies depuis le monorepo sur Netlify:
 
 - base/repository root: racine du repo;
 - package/site directory: `apps/web`;
 - build command: `npm run build`;
 - publish directory: `.next`.
+
+Sur Vercel:
+
+- Root Directory: `apps/web`;
+- Install Command: `npm install`;
+- Build Command: `npm run build`.
+
+Le fichier racine `vercel.json` a ete supprime volontairement pour eviter que Vercel force une commande workspace.
 
 Si tu utilises le dossier separe `100vvs-netlify`, importe directement ce dossier.
 

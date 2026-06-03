@@ -19,11 +19,18 @@ npm --workspace apps/api run build
 npm run start:prod
 ```
 
-## Frontend Netlify/Vercel
+## Frontend Netlify depuis la racine du monorepo
 
 ```bash
 npm install
 npm --workspace apps/web run build
+```
+
+## Frontend Vercel avec Root Directory apps/web
+
+```bash
+npm install
+npm run build
 ```
 
 ## Git avec chemin complet Windows si `git` n'est pas dans le PATH

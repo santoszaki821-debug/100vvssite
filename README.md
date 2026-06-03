@@ -216,7 +216,15 @@ Publish directory: apps/web/.next
 
 Le fichier `netlify.toml` est deja prepare.
 
-Pour Vercel, le fichier `vercel.json` est deja prepare.
+Pour Vercel:
+
+```text
+Root Directory: apps/web
+Install Command: npm install
+Build Command: npm run build
+```
+
+Le fichier `apps/web/vercel.json` est deja prepare pour ne pas relancer de commande workspace.
 
 ## Si tu vois `Failed to fetch`
 
